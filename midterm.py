@@ -5,6 +5,8 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from nltk.corpus import stopwords
 import nltk
 from collections import Counter
+from nltk.corpus import state_union
+from nltk.tokenize import PunktSentenceTokenizer
 
 app = Flask(__name__)
 
@@ -52,6 +54,17 @@ def nlp():
             word = text.lower()
             return 'The result of lowering case is %s' % word
 
+        def pos_tagging(text):
+            words = nltk.word_tokenize(text)
+            tagged = nltk.pos_tag(words)
+            return 'The result of using pos tagging is ', tagged
+
+        def remove_pun(text):
+            from nltk.tokenize import RegexpTokenizer
+            tokenizer = RegexpTokenizer(r'\w+')
+            sve = tokenizer.tokenize(text)
+            return 'The result of removing punctuation is %s' % sve
+
         if funct_type == 'count':
             result = count(text)
         elif funct_type == 'sent':
@@ -64,6 +77,10 @@ def nlp():
             result = remove(text)
         elif funct_type == 'lower_case':
             result = lower_case(text)
+        elif funct_type == 'pos_tagging':
+            result = pos_tagging(text)
+        elif funct_type == 'remove_pun':
+            result = remove_pun(text)
         elif funct_type == 'all':
             result1 = count(text)
             result2 = sent(text)
@@ -71,10 +88,12 @@ def nlp():
             result4 = freq(text)
             result5 = remove(text)
             result6 = lower_case(text)
-            result = [result1, result2, result3, result4, result5, result6]
+            result7 = pos_tagging(text)
+            result8 = remove_pun(text)
+            result = [result1, result2, result3, result4, result5, result6, result7, result8]
 
         return render_template("index.html", result=result)
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8000, debug=True)
